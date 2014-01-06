@@ -1,4 +1,4 @@
-Suicidal
+My pocketmine-MP plugins
 ========
 
-A pocketmine-MP plugin
+Here are my pocketmine plugins. These are simple, yet fun plugins i make. You are not allowed to copy and use as your own, without asking first.
