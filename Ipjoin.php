@@ -22,7 +22,6 @@ class ipjoin implements Plugin{
                   "Players" => array(),
                 ));
                 $this->config = $this->api->plugin->readYAML($this->api->plugin->configPath($this) ."IpJoin.yml");
-                $this->api->console->alias("ipa", "ipadmin");
                 $this->api->addHandler('player.connect', array($this, "connect"));
         }
         public function cmd($cmd, $params, $issuer){
