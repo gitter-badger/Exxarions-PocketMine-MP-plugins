@@ -27,7 +27,7 @@ public function Suicide($cmd, $issuer){
 $username = $issuer->username;
 $this->api->console->run("kill " . $username);
 $this->api->broadcast("".$username." was killed by his own hand")
-$this->api->chat->sendto("Goodbye cruel world!", ".$username.")
+$this->api->chat->sendTo(false, "Goodbye cruel world!", ".$username.")
 }
 
 public function __destruct(){
