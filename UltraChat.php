@@ -77,7 +77,7 @@ class UltraChat implements Plugin{
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	       
 	      $output .= "Deleted".$player."'s  prefix.\n";
-	      $this->api->chat->sendTo(false, "Your prefix is has been set back to $def", $player);
+	      $this->api->chat->sendTo(false, "Your prefix is has been set back to ".$def.", $player);
 	    break;
 	    case "nick":
 	      $player = $args[0];
