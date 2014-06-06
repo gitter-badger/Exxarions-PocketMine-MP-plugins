@@ -58,7 +58,7 @@ class UltraChat implements Plugin{
 	      $this->config['player'][$player]['pref'] =$pref;
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	      
-	      $output .= "[UChat] Gived ".$pref." to ".$player.".\n";
+	      $output .= "Changed ".$player."'s Nickname to ".$pref.".\n";
 	      console(FORMAT_GREEN."Added".$pref." prefix to ".$player.".");
 	      $this->api->chat->sendTo(false, "Your prefix has been changed to ".$pref." .", $player);
       break;
