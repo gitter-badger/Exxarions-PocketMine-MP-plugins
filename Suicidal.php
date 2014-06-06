@@ -6,11 +6,11 @@ name=Suicidal
 version=1.0
 description=Allows people to commit suicide
 author=A+Comics
-class=Kill
+class=Suicide
 apiversion=10
 */
 
-class Kill implements Plugin{
+class Suicide implements Plugin{
 
 private $api;
 
