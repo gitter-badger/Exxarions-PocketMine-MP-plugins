@@ -22,7 +22,9 @@ class UltraChat implements Plugin{
 		$this->api->addHandler("player.join", array($this, "handler"), 5);
 		$this->api->addHandler("player.chat", array($this, "handler"), 5);
 		$this->api->addHandler("player.chat", array($this, "eventHandle"), 50);
-		$this->api->addHandler("player.quit", array($this, "handler"), 5);		
+                $this->api->addHandler("player.chat", array($this, "eventHandle"), 100);
+		$this->api->addHandler("player.quit", array($this, "handler"), 5);
+		$this->api->schedule(1200, array($this, "minuteSchedule"), array(), true);
 		$this->readConfig();
 		$this->api->console->register("prefix", "Add/change a user's prefix", array($this, "Pref"));
 		$this->api->console->register("defprefix", "Set the default player Prefix", array($this, "Pref"));
