@@ -3,9 +3,9 @@
 /*
 __PocketMine Plugin__
 name=UltraChat
-description=All you need for complete chat control
+description=UltraChat
 version=1.0
-author=Various authors and put together by Exxarion
+author=Exxarion
 class=UltraChat
 apiversion=12
 */
@@ -21,17 +21,18 @@ class UltraChat implements Plugin{
 	public function init(){
 		$this->api->addHandler("player.join", array($this, "handler"), 5);
 		$this->api->addHandler("player.chat", array($this, "handler"), 5);
+		$this->api->addHandler("player.chat", array($this, "eventHandle"), 50);
 		$this->api->addHandler("player.quit", array($this, "handler"), 5);		
 		$this->readConfig();
-		$this->api->console->register("prefix", "Change a Prefix", array($this, "Pref"));
-		$this->api->console->register("defprefix", "Set default Prefix", array($this, "Pref"));
-		$this->api->console->register("delprefix", "Delete a prefix", array($this, "Pref"));
-		$this->api->console->register("nick", "Add a nickname to you or another user", array($this, "Pref"));
+		$this->api->console->register("prefix", "Add/change a user's prefix", array($this, "Pref"));
+		$this->api->console->register("defprefix", "Set the default player Prefix", array($this, "Pref"));
+		$this->api->console->register("delprefix", "Delete a user's prefix", array($this, "Pref"));
+		$this->api->console->register("nick", "Add/change a user's nickname", array($this, "Pref"));
 		$this->api->console->register("delnick", "Remove user's nickname", array($this, "Pref"));
-		$this->api->console->register("mute", "Shut a player up!", array($this, "Pref"));
-		$this->api->console->register("unmute", "Allow the player to speak again", array($this, "Pref"));
-		$this->api->console->register("chaton", "Enable chat", array($this, "Pref"));
-		$this->api->console->register("chatoff", "Disable chat", array($this, "Pref"));
+		$this->api->console->register("mute", "Shut a player up", array($this, "Pref"));
+		$this->api->console->register("unmute", "Allow a player to use chat again", array($this, "Pref"));
+		$this->api->console->register("chaton", "Allow users to chat", array($this, "Pref"));
+		$this->api->console->register("chatoff", "Turn off the chat", array($this, "Pref"));
 		console(FORMAT_GREEN."[UltraChat] Loaded and ready to go!");
 		
 	}
@@ -41,11 +42,10 @@ class UltraChat implements Plugin{
 	
 	public function readConfig(){
 		$this->path = $this->api->plugin->createConfig($this, array(
-			"chat-format" => "{WORLDNAME}:[{prefix}]<{DISPLAYNAME}> {MESSAGE}",
+			"chat-format" => "[{prefix}]<{DISPLAYNAME}> {MESSAGE}",
 			"default" => "Player",
-			"chat" => "on",
+			"chat" => "enable",
 		));
-		$this->config = $this->api->plugin->readYAML($this->path."config.yml");
 	}
 
 	
@@ -59,8 +59,7 @@ class UltraChat implements Plugin{
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	      
 	      $output .= "Changed ".$player."'s prefix to ".$pref.".\n";
-	      console(FORMAT_GREEN."Added".$pref." prefix to ".$player.".");
-	      $this->api->chat->sendTo(false, "Your prefix has been changed to ".$pref." .", $player);
+	      $this->api->chat->sendTo(false, "Your prefix has been changed to ".$pref." !", $player);
       break;
 	    case "defprefix":
 	      $def = $args[0];
@@ -68,7 +67,7 @@ class UltraChat implements Plugin{
 	      $this->config['default']=$def;
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	       
-	      $output .= "The Default player prefix is now ".$def.".\n";
+	      $output .= "The default player prefix has been changed to ".$def.".\n";
 	    break;
 	    case "delprefix":
 	      $player = $args[0];
@@ -76,8 +75,8 @@ class UltraChat implements Plugin{
 	      unset($this->config['player'][$player]['pref']);
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	       
-	      $output .= "Deleted".$player."'s  prefix.\n";
-	      $this->api->chat->sendTo(false, "Your prefix is has been set back to ".$def.", $player);
+	      $output .= "[UChat] Deleted".$player."'s  prefix.\n";
+	      $this->api->chat->sendTo(false, "Your prefix is now ".$def."!", $player);
 	    break;
 	    case "nick":
 	      $player = $args[0];
@@ -86,9 +85,8 @@ class UltraChat implements Plugin{
 	      $this->config['player'][$player]['nick'] = .$nick;
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	      
-	      $output .= "".$player."'s Nickname has changed.\n";
-	      console(FORMAT_GREEN."Changed ".$player."'s name to ".$nick." to.");
-	      $this->api->chat->sendTo(false, "Your nickname has been changed to ".$nick." .", $player);
+	      $output .= "".$player." Is now nicknamed ".$nick.".\n";
+	      $this->api->chat->sendTo(false, "Your nickname is now ".$nick." !", $player);
       break;
       case "delnick":
 	      $player = $args[0];
@@ -96,9 +94,8 @@ class UltraChat implements Plugin{
 	      unset($this->config['player'][$player]['nick']);
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	      
-	      $output .= "[UChat] ".$player."'s name is now real.\n";
-	      console(FORMAT_GREEN."".$player."'s Nickname has been removed.\n");
-	      $this->api->chat->sendTo(false, "Your Nickname has been reset", $player);
+	      $output .= "".$player."'s nickname has been removed.\n";
+	      $this->api->chat->sendTo(false, "Your nickname has been removed.", $player);
       break;
       case "mute":
 	      $player = $args[0];
@@ -106,9 +103,8 @@ class UltraChat implements Plugin{
 	      $this->config['player'][$player]['mute'] = true;
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	      
-	      $output .= "".$player." has been silenced.\n";
-	      console(FORMAT_GREEN."".$player." was muted.\n");
-	      $this->api->chat->sendTo(false, "You are not allowed to chat, ".$player."", $player);
+	      $output .= "".$player." has been muted.\n";
+	      $this->api->chat->sendTo(false, "You have been muted from the chat.", $player);
       break;
       case "unmute":
 	      $player = $args[0];
@@ -116,27 +112,26 @@ class UltraChat implements Plugin{
 	      unset($this->config['player'][$player]['mute']);
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	      
-	      $output .= "".$player." is allowed to chat again\n";
-	      console(FORMAT_GREEN."".$player." has been Un-muted\n");
-	      $this->api->chat->sendTo(false, "You are now allowed to use the chat", $player);
+	      $output .= "".$player." is has been unmuted\n";
+	      $this->api->chat->sendTo(false, "You are no longer muted from chat.", $player);
       break;
 	  case "chaton":
-	      $this->config['chat']="on";
-		  $output .= "The chat has been enabled\n";
+	      $this->config['chat']="enable";
+		  $output .= "Chat has been enabled\n";
 	  break;
 	  case "chatoff":
-	      $this->config['chat']="off";
+	      $this->config['chat']="disable";
 		  $output .= "Chat has been disabled\n";
 	  break;
-      default:		$output .= 'Chat plugin put together by Exxarion';
+      default:		$output .= 'Plugin by Exxarion';
       break;
 	  }
 	  return $output;
 	  }
-      break;
+
 			case "player.chat":
           $player = $data["player"]->username;
-		  If(!isset($this->config['player'][$player]['mute']) && $this->config['chat']=="on")
+		  If(!isset($this->config['player'][$player]['mute']) && $this->config['chat']=="enable")
 		  {
 		     If(!isset($this->config['player'][$player]['pref'])){
 		     $prefix=$this->config['default'];
@@ -152,7 +147,7 @@ class UltraChat implements Plugin{
 		     }
 			 }
 		    
-          $data = array("player" => $data["player"], "message" => str_replace(array("{DISPLAYNAME}", "{MESSAGE}", "{WORLDNAME}", "{prefix}"), array($nickname, $data["message"], $data["player"]->level->getName(), $prefix), $this->config["chat-format"]));
+          $data = array("player" => $data["player"], "message" => str_replace(array("{DISPLAYNAME}", "{MESSAGE}", "{prefix}"), array($nickname, $data["message"], $data["player"]->level->getName(), $prefix, $kills), $this->config["chat-format"]));
           if($this->api->handle("UltraChat.".$event, $data) !== false){
 					  $this->api->chat->broadcast($data["message"]);
 				 }
@@ -160,7 +155,7 @@ class UltraChat implements Plugin{
 		  }
 		   elseif(isset($this->config['player'][$player]['mute']))
 		   {
-		   $this->api->chat->sendTo(false, "You are not allowed to use chat.", $player);
+		   $this->api->chat->sendTo(false, "You cannot use the chat.", $player);
 		   return false;
 		   }
 		   else
@@ -168,29 +163,6 @@ class UltraChat implements Plugin{
 		   $this->api->chat->sendTo(false, "Chat is disabled", $player);
 		   return false;
 		   }
-{
-	private $api, $server;
-	
-	public function __construct(ServerAPI $api, $server = false){
-		$this->api = $api;
-		$server = ServerAPI::request();
-		
-		$this->api->plugin->load("http://gist.github.com/sekjun9878/6636915/raw/ChatGuard.php");
-	}
-	
-	public function init()
-	{
-		
-	}
-	
-	public function __destruct(){
-
-	}
-}
-
-public function init(){
-
-$this->api->addHandler("player.chat", array($this,"eventHandle"),50);
 }
 
 public function __destruct(){}
@@ -223,8 +195,24 @@ else {
 else {
 	$this->lastmessage[$username] = strtolower($message);
 	return true;
-
-			break;
+}
+{
+	private $api, $server;
+	
+	public function __construct(ServerAPI $api, $server = false){
+		$this->api = $api;
+		$server = ServerAPI::request();
+		
+		$this->api->plugin->load("http://gist.github.com/sekjun9878/6636915/raw/ChatGuard.php");
+	}
+	
+	public function init()
+	{
+		
+	}
+	
+	public function __destruct(){
+}
 		}
 	}	
 }
