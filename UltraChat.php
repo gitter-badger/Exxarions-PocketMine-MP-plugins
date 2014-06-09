@@ -35,7 +35,7 @@ class UltraChat implements Plugin{
 		$this->api->console->register("unmute", "Allow a player to use chat again", array($this, "Pref"));
 		$this->api->console->register("chaton", "Allow users to chat", array($this, "Pref"));
 		$this->api->console->register("chatoff", "Turn off the chat", array($this, "Pref"));
-                $this->api->console->register("profanefilter", "UltraChat profane filter", array($this, commandHandler)
+                $this->api->console->register("profanefilter", "UltraChat profane filter", array($this, "commandHandler")
 		console(FORMAT_GREEN."[UltraChat] Loaded and ready to go!");
 		
 	}
