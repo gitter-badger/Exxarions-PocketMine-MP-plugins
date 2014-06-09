@@ -197,21 +197,92 @@ else {
 	return true;
 }
 {
-	private $api, $server;
 	
 	public function __construct(ServerAPI $api, $server = false){
 		$this->api = $api;
 		$server = ServerAPI::request();
-		
-		$this->api->plugin->load("http://gist.github.com/sekjun9878/6636915/raw/ChatGuard.php");
 	}
 	
-	public function init()
+	public function init(){	
+
+		$this->config['config'] = new Config($this->api->plugin->configPath($this)."config.yml", CONFIG_YAML, array(
+			"mode" => "comprehensive",
+		));
+ 
+		$trim = explode("\n", Utils::curl_get("http://www.bannedwordlist.com/lists/swearWords.txt"));
+		$this->config['blockwords'] = array();
+		foreach($trim as $p)
+		{
+			$this->config['blockwords'][] = trim($p);
+		}
+	}
+	
+	public function eventHandler($data, $event)
+	{
+		switch($event)
+		{
+			case "player.chat":
+				//$this->api->chat->send($data['player'], $this->attatchChatPrefix($data['player'], $data['message']));
+				if($this->checkSpam($data['message'], "comprehensive") === true)
+				{
+					$this->api->chat->send($data['player'], $data['message']);
+				}
+				else
+				{
+					$data['player']->sendChat("[ChatGuard] Your chat message has been blocked.");
+				}
+				return false;
+				break;
+		}
+	}	
+	
+	private function checkSpam($string, $mode)
+	{
+		if($mode == 'comprehensive')
+		{
+			$string = preg_replace('/[^\da-z]/i', '', $string);
+			$string = preg_replace('/\s/', '', $string);
+ 
+		}
+			
+		foreach($this->config['blockwords'] as $badword)
+		{
+			if(strpos($string, $badword) !== false)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+ 
+	public function minuteSchedule()
+	{
+		//TODO:Add Stuff here
+	}
+	
+	public function commandHandler($cmd, $params, $issuer, $alias){
+		$output = "";
+		if($cmd != "profanefilter")
+		{
+			$output .= "Invalid command.";
+			return $output;
+		}
+			
+		if($issuer instanceof Player)
+		{
+			$output .= "Command can only be run by console.";
+			return $output;
+		}
+			
+		switch(array_shift($params)){
+ 
+		}
+		return $output;
+	}
+	
+	public function __destruct()
 	{
 		
-	}
-	
-	public function __destruct(){
 }
 		}
 	}	
