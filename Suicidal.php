@@ -19,6 +19,7 @@ $this->api = $api;
 }
 
 public function init(){
+$this->api->addHandler("player.chat", array($this, "handler"), 5));
 $this->api->console->register("suicide","Commit suicide!",array($this, "Suicide"));
 $this->api->ban->cmdWhitelist("suicide");
 }
