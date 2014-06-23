@@ -5,9 +5,9 @@ __PocketMine Plugin__
 name=Suicidal
 version=1.0
 description=Allows people to commit suicide
-author=A+Comics
+author=Exxarion
 class=Suicide
-apiversion=10
+apiversion=10,11,12
 */
 
 class Suicide implements Plugin{
@@ -26,8 +26,17 @@ $this->api->ban->cmdWhitelist("suicide");
 public function Suicide($cmd, $issuer){
 $username = $issuer->username;
 $this->api->console->run("kill " . $username);
-$this->api->broadcast("".$username." was killed by his own hand")
+$this->api->broadcast("".$username." died by his own hand")
 $this->api->chat->sendTo(false, "Goodbye cruel world!", ".$issuer.")
+public function eventHandler($data, $event)
+    {
+        switch($event)
+        {
+            case "player.chat":
+            $message = strtolower($data['message']);
+                if(strpos($message,'".$issuer." died') !== false) { 
+				return false;
+				}
 }
 
 public function __destruct(){
