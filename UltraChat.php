@@ -36,7 +36,6 @@ class UltraChat implements Plugin{
 		$this->api->console->register("chaton", "Allow users to chat", array($this, "Pref"));
 		$this->api->console->register("chatoff", "Turn off the chat", array($this, "Pref"));
                 $this->api->console->register("profanefilter", "UltraChat profane filter", array($this, "commandHandler")
-		console(FORMAT_GREEN."[UltraChat] Loaded and ready to go!");
 		
 	}
 	
@@ -78,7 +77,7 @@ class UltraChat implements Plugin{
 	      unset($this->config['player'][$player]['pref']);
 	      $this->api->plugin->writeYAML($this->path."config.yml", $this->config);
 	       
-	      $output .= "[UChat] Deleted".$player."'s  prefix.\n";
+	      $output .= "Deleted ".$player."'s  prefix.\n";
 	      $this->api->chat->sendTo(false, "Your prefix is now ".$def."!", $player);
 	    break;
 	    case "nick":
