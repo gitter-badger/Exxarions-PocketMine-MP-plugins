@@ -231,7 +231,7 @@ else {
 				}
 				else
 				{
-					$data['player']->sendChat("[ChatGuard] Your chat message has been blocked.");
+					$data['player']->sendChat("Your chat message has been blocked.");
 				}
 				return false;
 				break;
