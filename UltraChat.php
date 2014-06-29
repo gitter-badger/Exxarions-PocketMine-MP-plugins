@@ -4,7 +4,7 @@
 __PocketMine Plugin__
 name=UltraChat
 description=UltraChat
-version=1.0
+version=1.1
 author=Exxarion
 class=UltraChat
 apiversion=12
@@ -37,7 +37,6 @@ class UltraChat implements Plugin{
 		$this->api->console->register("chatoff", "Turn off the chat", array($this, "Pref"));
                 $this->api->console->register("profanefilter", "UltraChat profane filter", array($this, "commandHandler")
 		
-	}
 	
 	public function __destruct(){
 	}
