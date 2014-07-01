@@ -7,7 +7,7 @@ description=UltraChat
 version=1.1
 author=Exxarion
 class=UltraChat
-apiversion=12
+apiversion=11
 */
 
 
