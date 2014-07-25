@@ -26,7 +26,7 @@ $this->api->ban->cmdWhitelist("suicide");
 
 public function Suicide($cmd, $issuer){
 $username = $issuer->username;
-$this->api->console->run("kill '.$issuer.'" . $username);
+$this->api->console->run("kill '.$issuer.'");
 $this->api->broadcast("".$username." died by his own hand")
 $this->api->chat->sendTo(false, "Goodbye cruel world!", ".$issuer.")
 public function eventHandler($data, $event)
