@@ -21,8 +21,7 @@ class UltraChat implements Plugin{
 	public function init(){
 		$this->api->addHandler("player.join", array($this, "handler"), 5);
 		$this->api->addHandler("player.chat", array($this, "handler"), 5);
-		$this->api->addHandler("player.chat", array($this, "eventHandle"), 50);
-                $this->api->addHandler("player.chat", array($this, "eventHandle"), 100);
+		$this->api->addHandler("player.chat", array($this, "eventHandle"), 5);
 		$this->api->addHandler("player.quit", array($this, "handler"), 5);
 		$this->api->schedule(1200, array($this, "minuteSchedule"), array(), true);
 		$this->readConfig();
@@ -35,7 +34,7 @@ class UltraChat implements Plugin{
 		$this->api->console->register("unmute", "Allow a player to use chat again", array($this, "Pref"));
 		$this->api->console->register("chaton", "Allow users to chat", array($this, "Pref"));
 		$this->api->console->register("chatoff", "Turn off the chat", array($this, "Pref"));
-                $this->api->console->register("profanefilter", "UltraChat profane filter", array($this, "commandHandler")
+                $this->api->console->register("profanefilter", "UltraChat profane filter", array($this, "commandHandler"));
 		
 	
 	public function __destruct(){
@@ -223,7 +222,7 @@ else {
 		switch($event)
 		{
 			case "player.chat":
-				//$this->api->chat->send($data['player'], $this->attatchChatPrefix($data['player'], $data['message']));
+				$this->api->chat->send($data['player'], $this->attatchChatPrefix($data['player'], $data['message']));
 				if($this->checkSpam($data['message'], "comprehensive") === true)
 				{
 					$this->api->chat->send($data['player'], $data['message']);
